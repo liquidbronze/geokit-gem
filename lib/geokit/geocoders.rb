@@ -208,7 +208,7 @@ module Geokit
         res = self.call_geocoder_service(url)
         return GeoLoc.new if !res.is_a?(Net::HTTPSuccess)
         xml = res.body
-        logger.debug "Geocoder.ca geocoding. Address: #{address}. Result: #{xml}"
+        p "Geocoder.ca geocoding. Address: #{address}. Result: #{xml}"
         # Parse the document.
         doc = REXML::Document.new(xml)    
         address.lat = doc.elements['//latt'].text
@@ -216,7 +216,7 @@ module Geokit
         address.success = true
         return address
       rescue
-        logger.error "Caught an error during Geocoder.ca geocoding call: "+$!
+        p "Caught an error during Geocoder.ca geocoding call: "+$!
         return GeoLoc.new  
       end  
 
@@ -259,7 +259,7 @@ module Geokit
         
         return GeoLoc.new if !res.is_a?(Net::HTTPSuccess)
         data = res.body
-        logger.debug "Geocoder.us geocoding. Address: #{address}. Result: #{data}"
+        p "Geocoder.us geocoding. Address: #{address}. Result: #{data}"
         array = data.chomp.split(',')
         
         if array.length == 5
@@ -275,11 +275,11 @@ module Geokit
           res.success=true 
           return res
         else 
-          logger.info "geocoder.us was unable to geocode address: "+address
+          p "geocoder.us was unable to geocode address: "+address
           return GeoLoc.new      
         end
         rescue 
-          logger.error "Caught an error during geocoder.us geocoding call: "+$!
+          p "Caught an error during geocoder.us geocoding call: "+$!
           return GeoLoc.new
 
       end
@@ -299,7 +299,7 @@ module Geokit
         return GeoLoc.new if !res.is_a?(Net::HTTPSuccess)
         xml = res.body
         doc = REXML::Document.new(xml)
-        logger.debug "Yahoo geocoding. Address: #{address}. Result: #{xml}"
+        p "Yahoo geocoding. Address: #{address}. Result: #{xml}"
 
         if doc.elements['//ResultSet']
           res=GeoLoc.new
@@ -321,12 +321,12 @@ module Geokit
           res.success=true
           return res
         else 
-          logger.info "Yahoo was unable to geocode address: "+address
+          p "Yahoo was unable to geocode address: "+address
           return GeoLoc.new
         end   
 
         rescue 
-          logger.info "Caught an error during Yahoo geocoding call: "+$!
+          p "Caught an error during Yahoo geocoding call: "+$!
           return GeoLoc.new
       end
     end
@@ -355,7 +355,7 @@ module Geokit
         return GeoLoc.new if !res.is_a?(Net::HTTPSuccess)
         
         xml=res.body
-        logger.debug "Geonames geocoding. Address: #{address}. Result: #{xml}"
+        p "Geonames geocoding. Address: #{address}. Result: #{xml}"
         doc=REXML::Document.new(xml)
         
         if(doc.elements['//geonames/totalResultsCount'].text.to_i > 0)
@@ -372,12 +372,12 @@ module Geokit
           res.success=true
           return res
         else 
-          logger.info "Geonames was unable to geocode address: "+address
+          p "Geonames was unable to geocode address: "+address
           return GeoLoc.new
         end
         
         rescue
-          logger.error "Caught an error during Geonames geocoding call: "+$!
+          p "Caught an error during Geonames geocoding call: "+$!
       end
     end
 
@@ -398,7 +398,7 @@ module Geokit
         #        res = Net::HTTP.get_response(URI.parse("http://maps.google.com/maps/geo?ll=#{Geokit::Inflector::url_escape(address_str)}&output=xml&key=#{Geokit::Geocoders::google}&oe=utf-8"))
         return GeoLoc.new unless (res.is_a?(Net::HTTPSuccess) || res.is_a?(Net::HTTPOK))
         xml = res.body
-        logger.debug "Google reverse-geocoding. LL: #{latlng}. Result: #{xml}"
+        p "Google reverse-geocoding. LL: #{latlng}. Result: #{xml}"
         return self.xml2GeoLoc(xml)        
       end  
 
@@ -433,7 +433,7 @@ module Geokit
         res = self.call_geocoder_service("http://maps.google.com/maps/geo?q=#{Geokit::Inflector::url_escape(address_str)}&output=xml#{bias_str}&key=#{Geokit::Geocoders::google}&oe=utf-8")
         return GeoLoc.new if !res.is_a?(Net::HTTPSuccess)
         xml = res.body
-        logger.debug "Google geocoding. Address: #{address}. Result: #{xml}"
+        p "Google geocoding. Address: #{address}. Result: #{xml}"
         return self.xml2GeoLoc(xml, address)        
       end
       
@@ -469,7 +469,7 @@ module Geokit
         elsif doc.elements['//kml/Response/Status/code'].text == '620'
            raise Geokit::TooManyQueriesError
         else
-          logger.info "Google was unable to geocode address: "+address
+          p "Google was unable to geocode address: "+address
           return GeoLoc.new
         end
 
@@ -477,7 +477,7 @@ module Geokit
         # re-raise because of other rescue
         raise Geokit::TooManyQueriesError, "Google returned a 620 status, too many queries. The given key has gone over the requests limit in the 24 hour period or has submitted too many requests in too short a period of time. If you're sending multiple requests in parallel or in a tight loop, use a timer or pause in your code to make sure you don't send the requests too quickly."
       rescue
-        logger.error "Caught an error during Google geocoding call: "+$!
+        p "Caught an error during Google geocoding call: "+$!
         return GeoLoc.new
       end  
 
@@ -534,7 +534,7 @@ module Geokit
         response = self.call_geocoder_service("http://www.geoplugin.net/xml.gp?ip=#{ip}")
         return response.is_a?(Net::HTTPSuccess) ? parse_xml(response.body) : GeoLoc.new
       rescue
-        logger.error "Caught an error during GeoPluginGeocoder geocoding call: "+$!
+        p "Caught an error during GeoPluginGeocoder geocoding call: "+$!
         return GeoLoc.new
       end
 
@@ -590,7 +590,7 @@ module Geokit
         response = self.call_geocoder_service(url)
         response.is_a?(Net::HTTPSuccess) ? parse_body(response.body) : GeoLoc.new
       rescue
-        logger.error "Caught an error during HostIp geocoding call: "+$!
+        p "Caught an error during HostIp geocoding call: "+$!
         return GeoLoc.new
       end
 
@@ -657,7 +657,7 @@ module Geokit
             res = klass.send :geocode, address, options
             return res if res.success?
           rescue
-            logger.error("Something has gone very wrong during geocoding, OR you have configured an invalid class name in Geokit::Geocoders::provider_order. Address: #{address}. Provider: #{provider}")
+            p ("Something has gone very wrong during geocoding, OR you have configured an invalid class name in Geokit::Geocoders::provider_order. Address: #{address}. Provider: #{provider}")
           end
         end
         # If we get here, we failed completely.
@@ -674,7 +674,7 @@ module Geokit
             res = klass.send :reverse_geocode, latlng
             return res if res.success?
           rescue
-            logger.error("Something has gone very wrong during reverse geocoding, OR you have configured an invalid class name in Geokit::Geocoders::provider_order. LatLng: #{latlng}. Provider: #{provider}")
+            p ("Something has gone very wrong during reverse geocoding, OR you have configured an invalid class name in Geokit::Geocoders::provider_order. LatLng: #{latlng}. Provider: #{provider}")
           end
         end
         # If we get here, we failed completely.
